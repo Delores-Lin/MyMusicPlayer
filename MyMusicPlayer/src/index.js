@@ -43,6 +43,10 @@ function handleCallback() {
 }
 
 async function getToken(){
+    if(sessionStorage.getItem('access_token')){
+        console.log('got token');
+        return;
+    }
     const authparams = new URLSearchParams(window.location.search);
     console.log(authparams);
     const code = sessionStorage.getItem('code');

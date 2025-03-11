@@ -4,10 +4,112 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyMusicPlayer</title>
-    <style src="MyMusicPlayerStyle.css"></style>
+    <link rel="stylesheet" type="text/css" href="MyMusicPlayerStyle.css">
 </head>
 <body>
-    
+    <div id="main">
+        <div id="navBar">
+            <button id="Home">
+                <img src="svg/home-alt.svg">
+            </button>
+            <div id="searchBar">
+                <img src="svg/search.svg">
+                <input type="text" placeholder="想听什么？">
+            </div>
+            <div id="user"></div>
+        </div>
+        <div id="leftSideBar">
+            <div id="leftMain">
+                <div class="repository">
+                    <img src="svg/align-left.svg">
+                </div>
+                <div class="collections">
+                    <img src="https://misc.scdn.co/liked-songs/liked-songs-64.png" id="liked">
+                </div>
+                <div class="collections">
+                    <img src="" id="liked">
+                </div>
+                <div class="collections">
+                    <img src="" id="liked">
+                </div>
+                <div class="collections">
+                    <img src="" id="liked">
+                </div>
+                <div class="collections">
+                    <img src="" id="liked">
+                </div>
+                <div class="collections">
+                    <img src="" id="liked">
+                </div>
+                <div class="collections">
+                    <img src="" id="liked">
+                </div>
+                <div class="collections">
+                    <img src="" id="liked">
+                </div>
+                <div class="collections">
+                    <img src="" id="liked">
+                </div>
+            </div>
+        </div>
+        <div id="mainViewBar">
+            <div id="mainView">
+                <div id="recentPlay">
+                    <div id="topInfo">
+                        <h2>
+                            最近播放
+                        </h2>
+                    </div>
+                </div>
+                    <div id="recentPlayBlocks">
+                        <div id="blockContainer">
+                            <div id="recentPlayBlock">
+                                <img src="" class="recentPlay">
+                                <p class="name">
+
+                                </p>
+                            </div>
+                            <div id="recentPlayBlock">
+                                <img src="" class="recentPlay">
+                                <p class="name">
+                                    
+                                </p>
+                            </div>
+                            <div id="recentPlayBlock">
+                                <img src="https://misc.scdn.co/liked-songs/liked-songs-64.png" class="recentPlay">
+                                <p class="name">
+                                    已点赞的歌曲
+                                </p>
+                            </div>
+                            <div id="recentPlayBlock">
+                                <img src="" class="recentPlay">
+                                <p class="name">
+                                    
+                                </p>
+                            </div>
+                            <div id="recentPlayBlock">
+                                <img src="" class="recentPlay">
+                                <p class="name">
+                                    
+                                </p>
+                            </div>
+                            <div id="recentPlayBlock">
+                                <img src="" class="recentPlay">
+                                <p class="name">
+                                    
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                <div id="chooseStyle">
+                    <p>
+
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div id="playBar"></div>
+    </div>
 </body>
 <script src="bundle.js"></script>
 </html>
