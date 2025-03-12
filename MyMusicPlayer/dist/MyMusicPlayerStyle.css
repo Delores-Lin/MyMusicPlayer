@@ -57,8 +57,8 @@ html,body{
     grid-column-end: 5;
     justify-content: center;
     align-content: center;
+    place-items:center;
     border-radius: 50%;
-    background-color: #121212;
     width:60px;
     height:60px;
     border-color: rgb(0,0,0,0);
@@ -76,7 +76,6 @@ html,body{
     justify-content: stretch;
     align-items: center;
     border-radius: 35px;
-    background-color: #121212;
     border-color: rgb(0,0,0,0);
     background-color: rgb(67, 67, 67);
 }
@@ -100,6 +99,50 @@ html,body{
     caret-color: whitesmoke;
     color:whitesmoke;
 }
+
+
+    /* 主题切换 */
+.Mode{
+    grid-column-start:11;
+    grid-column-end: 13;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+#switch{
+    width:40px;
+    height:20px;
+    position: relative;
+}
+.slider{
+    position: relative;
+    display: block;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(96, 107, 232);
+    transition: .4s;
+    border-radius: 20px;
+}
+.slider::before {
+    content: "";
+    position: absolute;
+    height: 16px;       
+    width: 16px;        
+    left: 2px;         
+    bottom: 2px; 
+    background: white; /* 滑块颜色 */
+    border-radius: 50%;
+    transition: 0.4s;
+}
+#switchMod:checked + .slider{
+    background-color: rgb(120, 96, 232);
+}
+#switchMod:checked + .slider::before{
+    transform:translateX(21px);
+}
+
 
 /* leftSideBar样式 */
 
@@ -128,9 +171,12 @@ html,body{
     padding:5px;
 }
 .repository{
+    top:0;
     display:flex;
     width :auto;
     height:80px;
+    position: sticky;
+    background: linear-gradient(rgb(45, 45, 45),rgb(45, 45, 45)80%,rgb(0, 0, 0,0)100%);
 }
 .repository img{
     width:60px;
@@ -156,6 +202,8 @@ html,body{
     background-color: rgb(45, 45, 45,0.5);
     border-radius: 10px;
 }
+
+        /* 最近播放样式 */
 #recentPlay{
     display:flex;
     flex-direction: column;
@@ -215,6 +263,8 @@ h2{
     white-space: nowrap;
 }
 
+
+        /* 专辑推荐样式 */
 #chooseStyle{
     display:flex;
     width:100%;
@@ -242,11 +292,15 @@ h2{
     border-radius: 15px;
     background-color:rgb(255, 255, 255,0.2);
 }
+.album img{
+    border-radius: 6px;
+    display:block;
+}
 p{
     color:white;
 }
 
-
+            /* 专辑推荐交互 */
 .albums{
     display:flex;
     align-items: center;
@@ -269,20 +323,21 @@ p{
     background-color: rgb(255, 255, 255,0);
     margin:1rem;
     width:12rem;
-    height:13rem;
+    height:14rem;
     display:flex;
     align-items: center;
     flex-direction: column;
     justify-content: space-between;
     flex-wrap: wrap;
+    position:relative;
 }
 .album img,.album p{
-    width:90%;
+    width:100%;
     height:auto;
     /* overflow: hidden; */
     text-overflow: ellipsis;
     white-space: nowrap;
-    
+    z-index: 1;
 }
 .album p{
     text-align: center;
@@ -292,16 +347,44 @@ p{
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+.album:hover::after {
+    content: "";
+    position: absolute;
+    top: 1px;  /* 调整模糊层偏移量 */
+    left: 0;
+    width: 100%;
+    height: 90%;
+    
+    /* 使用与图片相同的背景 */
+    background: url(https://misc.scdn.co/liked-songs/liked-songs-64.png) no-repeat center center;
+    background-size: cover;
+    
+    /* 视觉效果调整 */
+    filter: blur(12px) brightness(0.8) opacity(0.9);
+    
+    z-index: 0; /* 置于图片下方 */
+}
+
+
+
+
 /* playBar样式 */
 
 #playBar{
     display: grid;
     grid-template-columns: repeat(12,1fr);
     align-items: center;
+    justify-content: center;
+
 }
 #albumPhoto{
     grid-column-start:1;
     grid-column-end: 2;
+    margin:5px;
+}
+#albumPhoto img{
+    border-radius: 5px;
 }
 #songInfo{
     grid-column-start:2;
@@ -325,4 +408,11 @@ p{
 #addToList{
     grid-column-start:12;
     grid-column-end: 13;
+}
+
+p{
+    color:white;
+}
+.iconB{
+    display:none;
 }

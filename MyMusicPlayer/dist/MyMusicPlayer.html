@@ -10,18 +10,37 @@
     <div id="main">
         <div id="navBar">
             <button id="Home">
-                <img src="svg/home-alt.svg">
+                <img class="icon" src="svg/home-alt.svg">
+                <img class="iconB" src="svg/home-alt-B.svg">
             </button>
             <div id="searchBar">
-                <img src="svg/search.svg">
+                <img class="icon" src="svg/search.svg">
+                <img class="iconB" src="svg/search-B.svg">
                 <input type="text" placeholder="想听什么？">
             </div>
             <div id="user"></div>
+            <div class="Mode">
+                <div id="bright">
+                    <p>
+                        B
+                    </p>
+                </div>
+                <label id="switch">
+                    <input id="switchMod" type="checkbox" hidden checked>
+                    <span class="slider"></span>
+                </label>
+                <div id="dark">
+                    <p>
+                        D
+                    </p>
+                </div>
+            </div>
         </div>
         <div id="leftSideBar">
             <div id="leftMain">
                 <div class="repository">
-                    <img src="svg/align-left.svg">
+                    <img class="icon" src="svg/align-left.svg">
+                    <img class="iconB" src="svg/align-left-B.svg">
                 </div>
                 <div class="collections">
                     <img src="https://misc.scdn.co/liked-songs/liked-songs-64.png" id="liked">
@@ -118,7 +137,7 @@
                 <div class="albums">
                     <div id="albumContainer">
                         <div class="album" id="1">
-                            <img src="https://misc.scdn.co/liked-songs/liked-songs-64.png">
+                            <img class="self" src="https://misc.scdn.co/liked-songs/liked-songs-64.png">
                             <p class="name">
                                 最喜欢的歌曲
                             </p>
@@ -186,17 +205,22 @@
                 </div>
             </div>
             <div id="previous">
-                <img src="svg/previous.svg">
+                <img class="icon" src="svg/previous.svg">
+                <img class="iconB" src="svg/previous-B.svg">
             </div>
             <div id="pause&resume">
-                <img id="pause" src="svg/pause.svg">
-                <img id="resume" src="svg/play.svg">
+                <img class="icon" id="pause" src="svg/pause.svg">
+                <img class="icon" id="resume" src="svg/play.svg">
+                <img class="iconB" id="pause" src="svg/pause-B.svg">
+                <img class="iconB" id="resume" src="svg/play-B.svg">
             </div>
             <div id="next">
-                <img src="svg/next.svg">
+                <img class="icon" src="svg/next.svg">
+                <img class="iconB" src="svg/next-B.svg">
             </div>
             <div id="addToList">
-                <img src="svg/add-to-list.svg">
+                <img class="icon" src="svg/add-to-list.svg">
+                <img class="iconB" src="svg/add-to-list-B.svg">
             </div>
         </div>
     </div>
