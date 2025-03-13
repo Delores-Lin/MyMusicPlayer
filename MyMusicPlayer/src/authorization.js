@@ -16,10 +16,10 @@ async function getAuthorization() {
 
     if(sessionStorage.getItem('code')) {
         console.log('has code already');
-        return;
+        return sessionStorage.getItem('code');
     }
     const state = generateRandomString(16);
-    const scope = 'user-read-private user-read-email';
+    const scope = 'user-read-private user-read-email user-top-read user-library-modify user-library-read user-read-currently-playing playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public';
     sessionStorage.setItem('spotifyState',state);
     const authUrl = new URL('https://accounts.spotify.com/authorize');
     const params = new URLSearchParams({
@@ -43,40 +43,40 @@ function handleCallback() {
 }
 
 async function getToken(){
-    if(sessionStorage.getItem('access_token')){
-        console.log('got token');
+    if(sessionStorage.getItem('tokenData')){
+        console.log(JSON.parse(sessionStorage.getItem('tokenData')));
         return;
     }
     const authparams = new URLSearchParams(window.location.search);
-    console.log(authparams);
-    const code = sessionStorage.getItem('code');
+    const code = authparams.get('code');
+
+    // console.log(code);
+
     const state = authparams.get('state');
-    console.log(state,'\n',code);
+    
+    // console.log(state,'\n',code);
+
     const body = new URLSearchParams({
+        grant_type:'authorization_code',
         code : code,
         redirect_uri : redirect_uri,
-        grant_type: 'authorization_code',
     });
     try{
-        fetch('https://accounts.spotify.com/api/token',{
+        const response = await fetch('https://accounts.spotify.com/api/token',{
             method: 'POST',
             body : body,
             headers: {
                 'content-type': 'application/x-www-form-urlencoded',
                 'Authorization': 'Basic ' + btoa(client_id + ':' + client_secret),
             },
-            json: true,
         })
         const tokenData = await response.json();
-        return tokenData.access_token;
+        sessionStorage.setItem('tokenData',JSON.stringify(tokenData));
+        return;
     }catch(error){
         return error;
     }
-    
-
 }
-// getToken();
-// sessionStorage.removeItem('code');
-// console.log(sessionStorage.getItem('code'));
-const access_token = getToken();
-sessionStorage.setItem('access_token',access_token);
+getToken();
+tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
+console.log(tokenData);
