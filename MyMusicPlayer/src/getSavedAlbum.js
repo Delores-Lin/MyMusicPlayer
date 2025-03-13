@@ -102,7 +102,7 @@ async function fetchUserPlaylists(headers,userId){
     const recentPlayName = document.querySelectorAll('#recentPlayBlock p');
     for(let i = 0;i<recentPlayImgs.length;i++){
         recentPlayImgs[i].src = tracksItems[i].track.album.images[0].url;
-        recentPlayImgs[i].id = tracksItems[i].track.id;
+        recentPlayImgs[i].id = tracksItems[i].track.album.id;
         recentPlayName[i].innerHTML = tracksItems[i].track.album.name;
     }
     return;

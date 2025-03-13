@@ -19,7 +19,7 @@ async function getAuthorization() {
         return sessionStorage.getItem('code');
     }
     const state = generateRandomString(16);
-    const scope = 'user-read-private user-read-email user-top-read user-library-modify user-library-read user-read-currently-playing playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public';
+    const scope = 'user-read-private user-read-email user-top-read user-library-modify user-library-read user-read-currently-playing playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-modify-playback-state streaming';
     sessionStorage.setItem('spotifyState',state);
     const authUrl = new URL('https://accounts.spotify.com/authorize');
     const params = new URLSearchParams({
