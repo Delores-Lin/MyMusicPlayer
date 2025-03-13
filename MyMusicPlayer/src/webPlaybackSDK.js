@@ -13,7 +13,7 @@ window.onSpotifyWebPlaybackSDKReady = async () => {
     const player = new Spotify.Player({
         name: "My Web Player",
         getOAuthToken: cb => { cb(token);},
-        volume: 0.5
+        volume: 0.3
     });
 
     player.addListener('ready', ({ device_id }) => {
@@ -88,11 +88,40 @@ albums.forEach(album => {
             const ids = await getAlbumTracks(headers, albumImg.id);
             console.log(ids.items.map(track => track.uri));
             playTrack(headers,ids.items.map(track => track.uri));
+            showCurrentPlayingTrack(headers);
         } else {
             console.log("No image or ID found in album block.");
         }
     });
 });
 
+async function getCurrentPlayingTrack(headers) {
+    try {
+        const response = await fetch(
+            `https://api.spotify.com/v1/me/player/currently-playing`,
+            {
+                method:'GET',
+                headers: headers,
+            }
+        );
+        const ids = await response.json();
+        return ids;
+    }catch(error){
+        console.log('Request Failed:',error);
+    }
+}
+async function showCurrentPlayingTrack(headers){
+    const track = await getCurrentPlayingTrack(headers);
+    if(track && track.item){
+        console.log(track.item);
+        let albumPhoto = document.querySelector('#albumPhoto img');
+        albumPhoto.src = track.item.album.images[0].url;
 
+        let trackName = document.querySelector('#songName p');
+        trackName.innerHTML = track.item.name;
 
+        let singer = document.querySelector('#singer p');
+        singer.innerHTML = track.item.artists[0].name;
+    }
+}
+showCurrentPlayingTrack(headers);

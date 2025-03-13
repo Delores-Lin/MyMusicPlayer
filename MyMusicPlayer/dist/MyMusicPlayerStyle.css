@@ -417,7 +417,10 @@ p{
     margin:5px;
 }
 #albumPhoto img{
+    width:60px;
+    height:60px;
     border-radius: 5px;
+    object-fit: contain;
 }
 #songInfo{
     grid-column-start:2;
