@@ -79,8 +79,9 @@ async function getAlbumTracks(headers,id) {
 }
 
 const albums = document.querySelectorAll('#recentPlayBlock');
+
 albums.forEach(album => {
-    album.addEventListener('click', async() => {
+    album.addEventListener('dblclick', async() => {
         console.log('click');
         const albumImg = album.querySelector('img'); 
         if (albumImg && albumImg.id) {
@@ -89,11 +90,84 @@ albums.forEach(album => {
             console.log(ids.items.map(track => track.uri));
             playTrack(headers,ids.items.map(track => track.uri));
             showCurrentPlayingTrack(headers);
+
+            ids.items.forEach(item =>{
+                createSongBlock(item.track_number,item.uri,item.name,item.artists[0].name,ids.name,`${parseInt(item.duration_ms/1000/60)}:${
+                    parseInt(item.duration_ms/1000 - parseInt(item.duration_ms/1000/60)*60)}`,albumImg.src);
+            })
+            const listBlock = document.querySelector('#showlist');
+            listBlock.style.display = 'flex';
+
+            const listPhoto = document.querySelector('#listPhoto img');
+            listPhoto.src = albumImg.src;
+
+            const listMaker = document.querySelector('.makerAndNumber p');
+            listMaker.innerHTML = `${ids.items[0].artists[0].name}·${ids.total}首歌曲`;
+
+            const listName = document.querySelector('.listName p');
+            listName.innerHTML = album.querySelector('.name').innerHTML;
         } else {
             console.log("No image or ID found in album block.");
         }
     });
 });
+
+function createSongBlock(num,songUri, songName, maker, album, time, imageUrl) {
+    // 创建一个新的 singleSongBlock 容器
+    const songBlock = document.createElement('div');
+    songBlock.classList.add('singleSongBlock');
+
+    // 创建和填充 num 元素
+    const numElement = document.createElement('p');
+    numElement.classList.add('num');
+    numElement.textContent = num;
+
+    // 创建并填充 songPhoto 元素
+    const songPhoto = document.createElement('div');
+    songPhoto.classList.add('songPhoto');
+    const img = document.createElement('img');
+    img.src = imageUrl;
+    img.id = songUri;
+    songPhoto.appendChild(img);
+
+    // 创建并填充 singleSongInfo 元素
+    const singleSongInfo = document.createElement('div');
+    singleSongInfo.classList.add('singleSongInfo');
+    const songNameElement = document.createElement('p');
+    songNameElement.classList.add('singleSongName');
+    songNameElement.textContent = songName;
+    const makerElement = document.createElement('p');
+    makerElement.classList.add('maker');
+    makerElement.textContent = maker;
+    singleSongInfo.appendChild(songNameElement);
+    singleSongInfo.appendChild(makerElement);
+
+    // 创建并填充 belongAlbum 元素
+    const belongAlbum = document.createElement('div');
+    belongAlbum.classList.add('belongAlbum');
+    const albumElement = document.createElement('p');
+    albumElement.textContent = album;
+    belongAlbum.appendChild(albumElement);
+
+    // 创建并填充 time 元素
+    const timeElement = document.createElement('div');
+    timeElement.classList.add('time');
+    const timeParagraph = document.createElement('p');
+    timeParagraph.textContent = time;
+    timeElement.appendChild(timeParagraph);
+
+    // 将所有创建的元素添加到 songBlock 中
+    songBlock.appendChild(numElement);
+    songBlock.appendChild(songPhoto);
+    songBlock.appendChild(singleSongInfo);
+    songBlock.appendChild(belongAlbum);
+    songBlock.appendChild(timeElement);
+
+    // 将 songBlock 添加到页面中的 container
+    const container = document.getElementById('body');
+    container.appendChild(songBlock);
+}
+
 
 async function getCurrentPlayingTrack(headers) {
     try {
@@ -122,6 +196,114 @@ async function showCurrentPlayingTrack(headers){
 
         let singer = document.querySelector('#singer p');
         singer.innerHTML = track.item.artists[0].name;
+
+
+        if(track.is_playing === false){
+            console.log('isPlaying');
+            resumeButton();
+        }else{
+            console.log('notPlaying');
+            pauseButton();
+        }
     }
 }
-showCurrentPlayingTrack(headers);
+
+setInterval(()=>showCurrentPlayingTrack(headers),5*1000);
+
+function pauseButton(){
+    const pause = document.querySelectorAll('#pause');
+    const resume = document.querySelectorAll('#resume');
+    const status = document.querySelector('#switchMod');
+    if(status.checked === true){
+        console.log('checked');
+        pause[0].style.display = 'block';
+        pause[1].style.display = 'none';
+        resume[0].style.display = 'none';
+        resume[1].style.display = 'none';
+    }else{
+        console.log('unchecked');
+        pause[0].style.display = 'none';
+        pause[1].style.display = 'block';
+        resume[0].style.display = 'none';
+        resume[1].style.display = 'none';
+    }
+    console.log('pause');
+}
+
+function resumeButton(){
+    const pause = document.querySelectorAll('#pause');
+    const resume = document.querySelectorAll('#resume');
+    const status = document.querySelector('#switchMod');
+    if(status.checked === true){
+        pause[0].style.display = 'none';
+        resume[0].style.display = 'block';
+    }else{
+        pause[1].style.display = 'none';
+        resume[1].style.display = 'block';
+    }
+    console.log('resume');
+}
+
+async function stopOrResumePlaying(status){
+    const deviceId = sessionStorage.getItem("spotify_device_id");
+    console.log('stopPlaying');
+    try{
+    const response = await fetch(`https://api.spotify.com/v1/me/player/${status}?device_id=${deviceId}`, {
+        method: "PUT",
+        headers: headers,
+    });
+    const data = response.json();
+    if(!response.ok){
+        console.log('getdatastatus',data.status);
+    }
+    }catch(error){
+        console.log('stopPlayingError',error);
+    }
+}
+
+const pause = document.querySelectorAll('#pause');
+
+pause.forEach(button =>{button.addEventListener('click',async ()=>{
+    await stopOrResumePlaying('pause');
+    pauseButton();
+    console.log('click');
+})});
+
+const resume = document.querySelectorAll('#resume');
+resume.forEach(button =>{button.addEventListener('click',async ()=>{
+    await stopOrResumePlaying('play');
+    resumeButton();
+    console.log('click');
+})});
+
+async function previousOrNextPlaying(status){
+    const deviceId = sessionStorage.getItem("spotify_device_id");
+    console.log('stopPlaying');
+    try{
+    const response = await fetch(`https://api.spotify.com/v1/me/player/${status}?device_id=${deviceId}`, {
+        method: "POST",
+        headers: headers,
+    });
+    const data = response.json();
+    if(!response.ok){
+        console.log('getdatastatus',data.status);
+    }
+    }catch(error){
+        console.log('stopPlayingError',error);
+    }
+}
+
+const next = document.querySelectorAll('#next');
+next.forEach(button =>{button.addEventListener('click',async ()=>{
+    await previousOrNextPlaying('next');
+    resumeButton();
+    console.log('click');
+})});
+
+const previous = document.querySelectorAll('#previous');
+previous.forEach(button =>{button.addEventListener('click',async ()=>{
+    await previousOrNextPlaying('previous');
+    resumeButton();
+    console.log('click');
+})});
+
