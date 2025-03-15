@@ -622,3 +622,88 @@ p{
     grid-column-start: 12;
     grid-column-end:13;
 }
+
+
+/* 歌词页面样式 */
+#lyrics{
+    grid-column-start:1;
+    grid-column-end: 4;
+    grid-row-start: 1;
+    grid-row-end: 3;
+    z-index: 1;
+    background-color: #ababab;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    align-content: center;
+    align-items: center;
+    grid-template-rows: 1fr;
+    /* display:none; */
+}
+#lyricsPhoto{
+    grid-column-start:1;
+    grid-column-end: 2;
+    background-color: #ababab;
+    width:100%;
+    height:100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#lyricsPhoto img{
+    width:80%;
+    height:auto;
+    border-color: #1abc54;
+    object-fit: contain;
+    border-radius: 20px;
+    z-index: 1;
+    box-shadow: 0 0 30px 1px #121212;
+}
+#lyricsPhoto::after {
+    content: "";
+    position: absolute;
+    top: 1px;  /* 调整模糊层偏移量 */
+    left: 0;
+    width: 100%;
+    height: calc(100% - 80px);
+    
+    /* 使用与图片相同的背景 */
+    background: var(--album-background, url("https://misc.scdn.co/liked-songs/liked-songs-64.png")) no-repeat center center;
+    background-size: cover;
+    
+    /* 视觉效果调整 */
+    filter: blur(100px) brightness(1) opacity(1);
+    
+    z-index: 0; /* 置于图片下方 */
+}
+
+#lyricsText {
+    grid-column-start:2;
+    grid-column-end: 3;
+    background-color: ;
+    width:100%;
+    height:100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+.songlyrics {
+    height:calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease-in-out;
+}
+.songlyrics p {
+    font-size: 18px;
+    color: gray;
+    margin: 5px 0;
+    transition: color 0.3s;
+}
+.highlight {
+    color: white !important;
+    font-size: 22px;
+    font-weight: bold;
+}

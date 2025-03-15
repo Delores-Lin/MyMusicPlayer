@@ -1,3 +1,4 @@
+import { async } from "regenerator-runtime";
 
 tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
 
@@ -307,3 +308,29 @@ previous.forEach(button =>{button.addEventListener('click',async ()=>{
     console.log('click');
 })});
 
+const geunius_client_id = 'STZe5j86xqdVNdNLJ0Zgc0YIquUheeFRku2PkkA_h3_ezLOmvi0Npe8Q-9oY0omR';
+const genius_client_secret = 'ZdHijQER7nT-kpVKQSfNd0o8C6NIhV_iWB6sJ3_dW4xrzPFbgPI6pRD8QsnQmC1roBe6czarNUU1Q-qr4zAPLw'
+const genius_access_token = 'T041Qisugq0wXcbcmxvmanoHeGvrmXYuBcnJyevvawyw10XylmADCAfHQMNEbgn6'
+
+
+async function searchGeniusLyrics(songTitle, artist) {
+    const config = {
+        access_token: genius_access_token,
+        q: `${songTitle} ${artist}`,
+    }
+    const queryParams = new URLSearchParams(config);
+    const url = `https://api.genius.com/search?${queryParams}`;
+    const response = await fetch(url, {
+        method:'GET',
+    });
+
+    const data = await response.json();
+    if (!data.response.hits.length) {
+        console.log("No lyrics found on Genius");
+        return null;
+    }
+
+    return data.response.hits[0].result.url;
+}
+
+searchGeniusLyrics("Shape of You", "Ed Sheeran").then(url => console.log(url));

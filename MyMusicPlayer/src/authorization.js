@@ -86,18 +86,7 @@ async function refreshAccessToken(){
     let tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
     let refresh_token = sessionStorage.getItem('refresh_token');
     try{    
-        const response = await fetch('https://accounts.spotify.com/api/token',{
-            method:'POST',
-            headers:{
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': 'Basic ' + btoa(client_id + ':' + client_secret),
-            },
-            body:new URLSearchParams({
-                grant_type: 'refresh_token',
-                refresh_token: refresh_token,
-                client_id: client_id,
-            }),
-        });
+        const response = await fetch(`/api/genius/search?q=${encodeURIComponent(songTitle + " " + artist)}`);
         const responses = await response.json();
         console.log(responses.access_token);
         if(responses.access_token){

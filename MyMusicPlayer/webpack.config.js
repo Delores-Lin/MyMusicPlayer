@@ -26,9 +26,26 @@ module.exports = {
     },
     devServer: {
         static: path.join(__dirname, 'dist'),
-        port: 3000,  // 本地服务器端口
+        port: 3000, 
         historyApiFallback: {
             index: '/MyMusicPlayer.html' 
         },
+            proxy: [
+                {
+                    context: ["/api/genius"], 
+                    target: "https://api.genius.com",
+                    changeOrigin: true, 
+                    pathRewrite: {
+                    "^/api/genius": "", 
+                    },
+                    secure: false,
+                    proxyTimeout: 60000,
+                    timeout: 60000,
+                    headers: {
+                    Authorization: "Bearer T041Qisugq0wXcbcmxvmanoHeGvrmXYuBcnJyevvawyw10XylmADCAfHQMNEbgn6",
+                    },
+                    logLevel: "debug", 
+                },
+            ],
     },
-};
+}
