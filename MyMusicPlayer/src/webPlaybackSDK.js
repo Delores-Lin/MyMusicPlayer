@@ -3,7 +3,23 @@ import { async } from "regenerator-runtime";
 tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
 
 access_token = tokenData.access_token;
+
+async function waitForToken() {
+    while (!sessionStorage.getItem('tokenData')) {
+        tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
+        access_token = tokenData.access_token;
 console.log(access_token);
+    // 等待1秒再检查一次
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    console.log("Token已获取");
+}
+
+if(access_token === null){
+    access_token = tokenData.access_token;
+    waitForToken();
+}
+
 headers = {
     'Authorization': `Bearer ${access_token}`
 }
@@ -80,13 +96,23 @@ async function getAlbumTracks(headers,id) {
 }
 
 const albums = document.querySelectorAll('#recentPlayBlock');
+const newalbum = document.querySelectorAll('.album');
 
-albums.forEach(album => {
+newalbum.forEach(album => {
     album.addEventListener('dblclick', async() => {
         console.log('click');
         const albumImg = album.querySelector('img'); 
         if (albumImg && albumImg.id) {
             console.log(albumImg.id);
+            const saved = await checkIfAlbumSaved(albumImg.id);
+            console.log(saved);
+            if(saved[0]){
+                const liked = document.querySelector('.like');
+                liked.style.backgroundColor = 'red';
+            }else{
+                const liked = document.querySelector('.like');
+                liked.style.backgroundColor = 'rgb(180,180,180,0.5)';
+            }
             const ids = await getAlbumTracks(headers, albumImg.id);
             console.log(ids.items.map(track => track.uri));
             playTrack(headers,ids.items.map(track => track.uri));
@@ -101,6 +127,50 @@ albums.forEach(album => {
 
             const listPhoto = document.querySelector('#listPhoto img');
             listPhoto.src = albumImg.src;
+            listPhoto.id = albumImg.id;
+
+            const listMaker = document.querySelector('.makerAndNumber p');
+            listMaker.innerHTML = `${ids.items[0].artists[0].name}·${ids.total}首歌曲`;
+
+            const listName = document.querySelector('.listName p');
+            listName.innerHTML = album.querySelector('.name').innerHTML;
+        } else {
+            console.log("No image or ID found in album block.");
+        }
+    });
+})
+
+albums.forEach(album => {
+    album.addEventListener('dblclick', async() => {
+        console.log('click');
+        const albumImg = album.querySelector('img');
+        if (albumImg && albumImg.id) {
+            console.log(albumImg.id);
+            const saved = await checkIfAlbumSaved(albumImg.id);
+            console.log(saved);
+            if(saved[0]){
+                const liked = document.querySelector('.like');
+                liked.style.backgroundColor = 'red';
+            }else{
+                const liked = document.querySelector('.like');
+                liked.style.backgroundColor = 'rgb(180,180,180,0.5)';
+            }
+            const ids = await getAlbumTracks(headers, albumImg.id);
+            console.log(ids.items.map(track => track.uri));
+            playTrack(headers,ids.items.map(track => track.uri));
+            showCurrentPlayingTrack(headers);
+
+            ids.items.forEach(item =>{
+                createSongBlock(item.track_number,item.uri,item.name,item.artists[0].name,ids.name,`${parseInt(item.duration_ms/1000/60)}:${
+                    parseInt(item.duration_ms/1000 - parseInt(item.duration_ms/1000/60)*60)}`,albumImg.src);
+            })
+            const listBlock = document.querySelector('#showlist');
+            listBlock.style.display = 'flex';
+            const mainViewBar = document.querySelector('#mainViewBar');
+            mainViewBar.style.display = 'none';
+            const listPhoto = document.querySelector('#listPhoto img');
+            listPhoto.src = albumImg.src;
+            listPhoto.id = albumImg.id;
 
             const listMaker = document.querySelector('.makerAndNumber p');
             listMaker.innerHTML = `${ids.items[0].artists[0].name}·${ids.total}首歌曲`;
@@ -112,6 +182,8 @@ albums.forEach(album => {
         }
     });
 });
+
+
 
 function createSongBlock(num,songUri, songName, maker, album, time, imageUrl) {
     // 创建一个新的 singleSongBlock 容器
@@ -169,6 +241,18 @@ function createSongBlock(num,songUri, songName, maker, album, time, imageUrl) {
     container.appendChild(songBlock);
 }
 
+async function checkIfAlbumSaved(id){
+    try{
+        const response = await fetch(`https://api.spotify.com/v1/me/albums/contains?ids=${id}`,{
+            method:'GET',
+            headers:headers,
+        })
+        const saved = await response.json();
+        return saved;
+    }catch(error){
+        console.log('checkalbumerror:',error);
+    }
+}
 
 async function getCurrentPlayingTrack(headers) {
     try {
@@ -182,7 +266,10 @@ async function getCurrentPlayingTrack(headers) {
         const ids = await response.json();
         return ids;
     }catch(error){
-        console.log('Request Failed:',error);
+        if(error.name === '401 (Unauthorized)'){
+            
+        }
+        console.log('Request Failed:',error.name);
     }
 }
 async function showCurrentPlayingTrack(headers){
@@ -308,29 +395,51 @@ previous.forEach(button =>{button.addEventListener('click',async ()=>{
     console.log('click');
 })});
 
-const geunius_client_id = 'STZe5j86xqdVNdNLJ0Zgc0YIquUheeFRku2PkkA_h3_ezLOmvi0Npe8Q-9oY0omR';
-const genius_client_secret = 'ZdHijQER7nT-kpVKQSfNd0o8C6NIhV_iWB6sJ3_dW4xrzPFbgPI6pRD8QsnQmC1roBe6czarNUU1Q-qr4zAPLw'
-const genius_access_token = 'T041Qisugq0wXcbcmxvmanoHeGvrmXYuBcnJyevvawyw10XylmADCAfHQMNEbgn6'
+const home = document.querySelector('#Home');
+const showList = document.querySelector('#showlist');
+const mainViewBar = document.querySelector('#mainViewBar');
+home.addEventListener('click',()=>{
+    showList.style.display = 'none';
+    mainViewBar.style.display = 'flex';
+})
 
-
-async function searchGeniusLyrics(songTitle, artist) {
+// 收藏专辑
+const saveAlbum = document.querySelector("#listPhoto img");
+const saveAlbumId = saveAlbum.id;
+const liked = document.querySelector('.like');
+async function getAlbumSaved(id){
     const config = {
-        access_token: genius_access_token,
-        q: `${songTitle} ${artist}`,
+        ids:id,
     }
     const queryParams = new URLSearchParams(config);
-    const url = `https://api.genius.com/search?${queryParams}`;
-    const response = await fetch(url, {
-        method:'GET',
-    });
-
-    const data = await response.json();
-    if (!data.response.hits.length) {
-        console.log("No lyrics found on Genius");
-        return null;
+    try {
+        const response = await fetch(
+            `https://api.spotify.com/v1/me/albums?${queryParams}`,
+            {
+                method:'PUT',
+                headers: headers,
+                body:{
+                    ids:[id],
+                }
+            }
+        );
+        const ids = await response.json();
+        return ids;
+    }catch(error){
+        console.log('Request Failed:',error);
     }
-
-    return data.response.hits[0].result.url;
 }
-
-searchGeniusLyrics("Shape of You", "Ed Sheeran").then(url => console.log(url));
+async function checkAndSave(id){
+    const status = await checkIfAlbumSaved(id);
+    if(status[0]){
+        liked.style.backgroundColor = 'rgb(180,180,180,0.5)';
+    }else{
+        const response = await getAlbumSaved(id);
+        liked.style.backgroundColor = 'red';
+    }
+}
+liked.addEventListener('click',()=>{
+    const saveAlbum = document.querySelector("#listPhoto img");
+    const saveAlbumId = saveAlbum.id;
+    checkAndSave(saveAlbumId);
+})

@@ -48,7 +48,6 @@ slider.addEventListener('change',()=>{
         repository.style.background = 'linear-gradient(rgb(67, 67, 67),rgb(67, 67, 67)80%,rgb(0, 0, 0,0)100%)';
         iconsB.forEach(icon => icon.style.display = 'none');
         icons.forEach(icon => icon.style.display = 'flex');
-
         slider.checked = true;
     }
 })

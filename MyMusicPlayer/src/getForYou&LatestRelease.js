@@ -2,6 +2,23 @@ tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
 
 access_token = tokenData.access_token;
 console.log(access_token);
+
+async function waitForToken() {
+    while (!sessionStorage.getItem('tokenData')) {
+        tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
+        access_token = tokenData.access_token;
+console.log(access_token);
+    // 等待1秒再检查一次
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    console.log("Token已获取");
+}
+
+if(access_token === null){
+    access_token = tokenData.access_token;
+    waitForToken();
+}
+
 headers = {
     'Authorization': `Bearer ${access_token}`
 }

@@ -32,7 +32,6 @@ async function getAuthorization() {
     window.location.href = `${authUrl}?${params}`
 }
 
-getAuthorization();
 
 function handleCallback() {
     const url = new URLSearchParams(window.location.search);
@@ -41,6 +40,15 @@ function handleCallback() {
         sessionStorage.setItem('code',code);
     }
 }
+
+async function makeSureCode(){
+    await getAuthorization();
+}
+
+makeSureCode();
+// while(!sessionStorage.getItem('code')){
+//     makeSureCode();
+// }
 
 async function getToken(){
     if(sessionStorage.getItem('tokenData')){
@@ -75,10 +83,24 @@ async function getToken(){
         sessionStorage.setItem('refresh_token',tokenData.refresh_token);
         return;
     }catch(error){
+        sessionStorage.removeItem('tokenData');
+        sessionStorage.removeItem('refresh_token');
         return error;
     }
 }
-getToken();
+
+async function waitForToken() {
+    while (!sessionStorage.getItem('tokenData')) {
+        await getToken();
+    // 等待1秒再检查一次
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    console.log("Token已获取");
+}
+
+waitForToken();
+
+
 tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
 console.log(tokenData);
 
@@ -86,7 +108,17 @@ async function refreshAccessToken(){
     let tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
     let refresh_token = sessionStorage.getItem('refresh_token');
     try{    
-        const response = await fetch(`/api/genius/search?q=${encodeURIComponent(songTitle + " " + artist)}`);
+        const response = await fetch(`https://accounts.spotify.com/api/token`,{
+            method:'POST',
+            headers:{
+                'content-type': 'application/x-www-form-urlencoded',
+            },
+            body:new URLSearchParams({
+                grant_type: 'refresh_token',
+                refresh_token: refresh_token,
+                client_id: client_id,
+            }),
+        });
         const responses = await response.json();
         console.log(responses.access_token);
         if(responses.access_token){
@@ -99,5 +131,7 @@ async function refreshAccessToken(){
     }catch(error){
         console.log('error:',error);}
 }
-refreshAccessToken();
-setInterval(refreshAccessToken(),59*60*1000);
+async function waitrefresh(){
+    await refreshAccessToken();
+}
+setInterval(waitrefresh(),50*60*1000);

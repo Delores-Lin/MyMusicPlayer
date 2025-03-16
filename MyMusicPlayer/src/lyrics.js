@@ -1,5 +1,21 @@
 tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
 
+async function waitForToken() {
+    while (!sessionStorage.getItem('tokenData')) {
+        tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
+        access_token = tokenData.access_token;
+console.log(access_token);
+    // 等待1秒再检查一次
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    console.log("Token已获取");
+}
+
+if(access_token === null){
+    access_token = tokenData.access_token;
+    waitForToken();
+}
+
 access_token = tokenData.access_token;
 console.log(access_token);
 headers = {
@@ -119,6 +135,13 @@ async function getSpotifyPlaybackState() {
         if (response.status === 200) {
             const data = await response.json();
             console.log(data.progress_ms / 1000);
+            const photo = document.querySelector('#lyricsPhoto img');
+            const lyricsPhoto = document.querySelector('#lyricsPhoto');
+            const destphoto = data.item.album.images[0].url;
+            if(photo.src != destphoto){
+                photo.src = destphoto;
+                lyricsPhoto.style.setProperty('--album-background',`url(${destphoto})`);
+            }
             return data.progress_ms / 1000;
         }
     } catch (error) {
@@ -143,10 +166,33 @@ async function syncLyrics() {
     const lineHeight = lyricElements[0]?.offsetHeight + 10 || 60;
     const initialOffset = lyricsContainer.offsetHeight / 2 - lineHeight / 2;
     const offset = activeIndex * lineHeight - initialOffset ;
-    lyricsContainer.style.transform = `translateY(-${offset}px)`;
+    console.log('offset',offset);
+    lyricsContainer.style.transform = `translateY(${-offset}px)`;
+
+
 }
+
 const lineHeight = lyricElements[0]?.offsetHeight  || 60;
 const initialOffset = lyricsContainer.offsetHeight  / 2 - lineHeight / 2;
 lyricsContainer.style.transform = `translateY(${initialOffset}px)`;
-syncLyrics();
+
 setInterval(syncLyrics, 1000);
+
+// 控制歌词页面
+const lyricsPage = document.querySelector('#lyrics');
+const albumButton = document.querySelector('#albumPhoto');
+albumButton.addEventListener('click',()=>{
+    const currentDisplay = window.getComputedStyle(lyricsPage).display;
+    if(currentDisplay === 'grid'){
+        lyricsPage.style.transform = `translateY(100vh)`;
+        setTimeout(()=>{
+            lyricsPage.style.display = 'none';
+        },300);
+    }else{
+        lyricsPage.style.transform = `translateY(100vh)`;
+        lyricsPage.style.display = 'grid';
+        setTimeout(()=>{
+            lyricsPage.style.transform = `translateY(0)`;
+        },50)
+    }
+})

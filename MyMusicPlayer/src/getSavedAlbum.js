@@ -2,6 +2,22 @@ tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
 
 access_token = tokenData.access_token;
 console.log(access_token);
+
+async function waitForToken() {
+    while (!sessionStorage.getItem('tokenData')) {
+        tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
+        access_token = tokenData.access_token;
+console.log(access_token);
+    // 等待1秒再检查一次
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    console.log("Token已获取");
+}
+
+if(access_token === null){
+    access_token = tokenData.access_token;
+    waitForToken();
+}
 headers = {
     'Authorization': `Bearer ${access_token}`
 }
@@ -87,15 +103,23 @@ async function fetchUserPlaylists(headers,userId){
     const playlistsItems = playlists.items;
     let collections = document.querySelectorAll('.collections img');
     let i = 0;
+    let collectionName = document.querySelectorAll('.collectionName');
+    let collectionArtist = document.querySelectorAll('.collectionArtist');
     for(i;i<playlistsItems.length && i<9 ;i++){
         collections[i].src = playlistsItems[i].images[0].url;
         collections[i].id = playlistsItems[i].id;
+        collectionName[i].innerHTML = playlistsItems[i].name;
+        collectionArtist[i].innerHTML = playlistsItems[i].owner.display_name;
+        collectionName[i].id = playlistsItems[i].uri;
     }
     const tracks = await getUserSavedTracks(headers);
     const tracksItems = tracks.items;
     for(let j=0 ;i<tracksItems.length && i<9 ;i++){
-        collections[i].id = tracksItems[j].track.id;
+        collections[i].id = tracksItems[j].track.album.id;
         collections[i].src = tracksItems[j].track.album.images[0].url;
+        collectionName[i].innerHTML = tracksItems[j].track.album.name;
+        collectionArtist[i].innerHTML = tracksItems[j].track.album.artists[0].name;
+        collectionName[i].id = tracksItems[j].uri;
         j++;
     }
     const recentPlayImgs = document.querySelectorAll('#recentPlayBlock img');
@@ -110,3 +134,29 @@ async function fetchUserPlaylists(headers,userId){
 // let tracks = getUserTopItems(headers);
 fetchUserPlaylists(headers,userId);
 // console.log(tracks);
+
+const listsButton = document.querySelector('.repository');
+
+const Main = document.querySelector('#main');
+
+listsButton.addEventListener('click',()=>{
+    const mainWidth = window.getComputedStyle(Main).gridTemplateColumns;
+    if(mainWidth.includes('97px')){
+        Main.style.gridTemplateColumns = '300px 1fr 1fr';
+        const collectionInfos = document.querySelectorAll('.collectionInfo');
+        const repository = document.querySelector('.repository h2');
+        repository.style.display = 'block';
+        collectionInfos.forEach(collectionInfo => {
+            collectionInfo.style.display = 'flex';
+        });
+    }
+    if(mainWidth.includes('300px')){
+        Main.style.gridTemplateColumns = '97px 1fr 1fr';
+        const collectionInfos = document.querySelectorAll('.collectionInfo');
+        const repository = document.querySelector('.repository h2');
+        repository.style.display = 'none';
+        collectionInfos.forEach(collectionInfo => {
+            collectionInfo.style.display = 'none';
+        });
+    }
+})
