@@ -1,8 +1,12 @@
-tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
+import { addAlbumClick } from "./webPlaybackSDK";
+import { addPlaylistClick } from "./webPlaybackSDK";
+const tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
 
-access_token = tokenData.access_token;
+const access_token = tokenData.access_token;
 console.log(access_token);
-
+let headers = {
+    'Authorization': `Bearer ${access_token}`
+}
 async function waitForToken() {
     while (!sessionStorage.getItem('tokenData')) {
         tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
@@ -101,20 +105,24 @@ async function getUserSavedTracks(headers) {
 async function fetchUserPlaylists(headers,userId){
     const playlists =await getUserPlaylists(headers,userId);
     const playlistsItems = playlists.items;
+    let collectionBlock = document.querySelectorAll('.collections')
     let collections = document.querySelectorAll('.collections img');
     let i = 0;
-    let collectionName = document.querySelectorAll('.collectionName');
+    let collectionName = document.querySelectorAll('.collectionInfo .name');
     let collectionArtist = document.querySelectorAll('.collectionArtist');
     for(i;i<playlistsItems.length && i<9 ;i++){
+        collectionBlock[i].id = 'playlist';
         collections[i].src = playlistsItems[i].images[0].url;
         collections[i].id = playlistsItems[i].id;
         collectionName[i].innerHTML = playlistsItems[i].name;
         collectionArtist[i].innerHTML = playlistsItems[i].owner.display_name;
         collectionName[i].id = playlistsItems[i].uri;
     }
+    addPlaylistClick();
     const tracks = await getUserSavedTracks(headers);
     const tracksItems = tracks.items;
     for(let j=0 ;i<tracksItems.length && i<9 ;i++){
+        collectionBlock[i].id = 'album';
         collections[i].id = tracksItems[j].track.album.id;
         collections[i].src = tracksItems[j].track.album.images[0].url;
         collectionName[i].innerHTML = tracksItems[j].track.album.name;
@@ -122,13 +130,16 @@ async function fetchUserPlaylists(headers,userId){
         collectionName[i].id = tracksItems[j].uri;
         j++;
     }
-    const recentPlayImgs = document.querySelectorAll('#recentPlayBlock img');
-    const recentPlayName = document.querySelectorAll('#recentPlayBlock p');
+    const recentPlayBlock = document.querySelectorAll('.recentPlayBlock')
+    const recentPlayImgs = document.querySelectorAll('.recentPlayBlock img');
+    const recentPlayName = document.querySelectorAll('.recentPlayBlock p');
     for(let i = 0;i<recentPlayImgs.length;i++){
+        recentPlayBlock[i].id = 'album';
         recentPlayImgs[i].src = tracksItems[i].track.album.images[0].url;
         recentPlayImgs[i].id = tracksItems[i].track.album.id;
         recentPlayName[i].innerHTML = tracksItems[i].track.album.name;
     }
+    addAlbumClick();
     return;
 }
 // let tracks = getUserTopItems(headers);

@@ -1,5 +1,5 @@
-tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
-
+const tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
+let access_token = tokenData.access_token;
 async function waitForToken() {
     while (!sessionStorage.getItem('tokenData')) {
         tokenData = JSON.parse(sessionStorage.getItem('tokenData'));

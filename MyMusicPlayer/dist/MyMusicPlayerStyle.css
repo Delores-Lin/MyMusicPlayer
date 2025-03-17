@@ -232,7 +232,7 @@ html,body{
     align-items: start;
     display:none;
 }
-.collectionName{
+.collectionInfo .name{
     width:calc(300px - 70px);
     font-size: large;
     white-space:nowrap;
@@ -301,7 +301,7 @@ h2{
     flex-wrap: wrap;
     width:80%;
 }
-#recentPlayBlock{
+.recentPlayBlock{
     display:flex;
     justify-content:left;
     align-items: center;
@@ -315,16 +315,16 @@ h2{
     background-color: rgb(255, 255, 255,0.2);
     color:white;
 }
-#recentPlayBlock:hover{
+.recentPlayBlock:hover{
     cursor: pointer;
 }
-#recentPlayBlock img{
+.recentPlayBlock img{
     width:auto;
     height:100%;
     border-radius: 5px;
     object-fit: contain;
 }
-#recentPlayBlock p{
+.recentPlayBlock p{
     width:100%;
     padding-left: 5px;
     font-weight: bold;
@@ -661,6 +661,7 @@ p{
 }
 .singleSongBlock:hover{
     background-color: rgb(180,180,180,0.1);
+    cursor: pointer;
 }
 .num{
     grid-column-start: 1;
@@ -697,7 +698,16 @@ p{
     grid-column-start: 12;
     grid-column-end:13;
 }
-
+.singleSongName{
+    overflow: hidden;
+    white-space:nowrap;
+    text-overflow: ellipsis;
+}
+.belongAlbum p{
+    overflow: hidden;
+    white-space:nowrap;
+    text-overflow: ellipsis;
+}
 
 /* 歌词页面样式 */
 #lyrics{
@@ -741,11 +751,11 @@ p{
     top: 1px;  /* 调整模糊层偏移量 */
     left: 0;
     width: 100%;
-    height: calc(100% - 80px);
+    height: 100%;
     
     /* 使用与图片相同的背景 */
     background: var(--album-background, url("https://misc.scdn.co/liked-songs/liked-songs-64.png")) no-repeat center center;
-    background-size: cover;
+    background-size:cover;
     
     /* 视觉效果调整 */
     filter: blur(100px) brightness(1) opacity(1);
@@ -775,7 +785,7 @@ p{
 }
 .songlyrics p {
     font-size: 22px;
-    color: gray;
+    color: rgb(192, 192, 192);
     margin: 5px 0;
     transition: color 0.3s;
 }

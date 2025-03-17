@@ -1,7 +1,12 @@
-tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
+import { addAlbumClick } from "./webPlaybackSDK";
+import { addPlaylistClick } from "./webPlaybackSDK";
+const tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
 
-access_token = tokenData.access_token;
+const access_token = tokenData.access_token;
 console.log(access_token);
+let headers = {
+    'Authorization': `Bearer ${access_token}`
+}
 
 async function waitForToken() {
     while (!sessionStorage.getItem('tokenData')) {
@@ -54,6 +59,7 @@ async function getFeaturedPlaylists(headers) {
             }
         );
         const playlists = await response.json();
+        addPlaylistClick();
         return playlists;
     }catch(error){
         console.log('Request Failed:',error);
@@ -88,6 +94,7 @@ async function pushplaylists(headers){
     const albumsImg = document.querySelectorAll('.album img');
     const albumsp = document.querySelectorAll('.album p');
     for(let i = 0 ;i<8 ; i++){
+        albums[i].id = 'playlist';
         albumsImg[i].src = items[i].icons[0].url;
         albumsImg[i].id = items[i].id;
         albums[i].style.setProperty('--album-background',`url(${items[i].icons[0].url})`);
@@ -102,11 +109,13 @@ async function pushAlbums(headers){
     const albums = document.querySelectorAll('.album');
     const albumsp = document.querySelectorAll('.album p');
     for(let i = 0 ;i<8 ; i++){
+        albums[i].id = 'album';
         albumsImg[i].src = items[i].images[0].url;
         albums[i].style.setProperty('--album-background',`url(${items[i].images[0].url})`);
         albumsImg[i].id = items[i].id;
         albumsp[i].innerHTML = items[i].name;
     }
+    addAlbumClick();
 }
 
 pushplaylists(headers);

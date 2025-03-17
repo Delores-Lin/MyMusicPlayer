@@ -1,8 +1,8 @@
 import { async } from "regenerator-runtime";
 
-tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
+const tokenData = JSON.parse(sessionStorage.getItem('tokenData'));
 
-access_token = tokenData.access_token;
+const access_token = tokenData.access_token;
 
 async function waitForToken() {
     while (!sessionStorage.getItem('tokenData')) {
@@ -20,40 +20,8 @@ if(access_token === null){
     waitForToken();
 }
 
-headers = {
+const headers = {
     'Authorization': `Bearer ${access_token}`
-}
-
-window.onSpotifyWebPlaybackSDKReady = async () => {
-    const token = JSON.parse(sessionStorage.getItem('tokenData')).access_token;
-
-    const player = new Spotify.Player({
-        name: "My Web Player",
-        getOAuthToken: cb => { cb(token);},
-        volume: 0.3
-    });
-
-    player.addListener('ready', ({ device_id }) => {
-        console.log("Spotify Player Ready, Device ID:", device_id);
-        sessionStorage.setItem("spotify_device_id", device_id);
-    });
-
-    player.addListener('not_ready', ({ device_id }) => {
-        console.log("Spotify Player Not Ready, Device ID:", device_id);
-    });
-
-    player.addListener('initialization_error', ({ message }) => {
-        console.error("Initialization Error:", message);
-    });
-
-    player.addListener('authentication_error', ({ message }) => {
-        console.error("Authentication Error:", message);
-    });
-
-    player.addListener('account_error', ({ message }) => {
-        console.error("Account Error:", message);
-    });
-    await player.connect();
 }
 
 async function playTrack(headers,trackUri) {
@@ -95,95 +63,108 @@ async function getAlbumTracks(headers,id) {
     }
 }
 
-const albums = document.querySelectorAll('#recentPlayBlock');
-const newalbum = document.querySelectorAll('.album');
+// setTimeout(()=>{
+    
+// },2000);
 
-newalbum.forEach(album => {
-    album.addEventListener('dblclick', async() => {
-        console.log('click');
-        const albumImg = album.querySelector('img'); 
-        if (albumImg && albumImg.id) {
-            console.log(albumImg.id);
-            const saved = await checkIfAlbumSaved(albumImg.id);
-            console.log(saved);
-            if(saved[0]){
-                const liked = document.querySelector('.like');
-                liked.style.backgroundColor = 'red';
-            }else{
-                const liked = document.querySelector('.like');
-                liked.style.backgroundColor = 'rgb(180,180,180,0.5)';
+export async function addAlbumClick(){
+    const albums = document.querySelectorAll('#album');
+    console.log(albums);
+    albums.forEach(album => {
+        album.addEventListener('dblclick', async() => {
+            console.log('click');
+            const albumImg = album.querySelector('img');
+            if (albumImg && albumImg.id) {
+                console.log(albumImg.id);
+                const saved = await checkIfAlbumSaved(albumImg.id);
+                console.log(saved);
+                if(saved[0]){
+                    const liked = document.querySelector('.like');
+                    liked.style.backgroundColor = 'red';
+                }else{
+                    const liked = document.querySelector('.like');
+                    liked.style.backgroundColor = 'rgb(180,180,180,0.5)';
+                }
+                const ids = await getAlbumTracks(headers, albumImg.id);
+                console.log(ids.items.map(track => track.uri));
+                playTrack(headers,ids.items.map(track => track.uri));
+                showCurrentPlayingTrack(headers);
+                clearSongs();
+                ids.items.forEach(item =>{
+                    createSongBlock(item.track_number,item.uri,item.name,item.artists[0].name,ids.name,`${parseInt(item.duration_ms/1000/60)}:${
+                        parseInt(item.duration_ms/1000 - parseInt(item.duration_ms/1000/60)*60)}`,albumImg.src);
+                })
+                const listBlock = document.querySelector('#showlist');
+                listBlock.style.display = 'flex';
+                const mainViewBar = document.querySelector('#mainViewBar');
+                mainViewBar.style.display = 'none';
+                const listPhoto = document.querySelector('#listPhoto img');
+                listPhoto.src = albumImg.src;
+                listPhoto.id = albumImg.id;
+    
+                const listMaker = document.querySelector('.makerAndNumber p');
+                listMaker.innerHTML = `${ids.items[0].artists[0].name}·${ids.total}首歌曲`;
+    
+                const listName = document.querySelector('.listName p');
+                listName.innerHTML = album.querySelector('.name').innerHTML;
+                addSongclick();
+            } else {
+                console.log("No image or ID found in album block.");
             }
-            const ids = await getAlbumTracks(headers, albumImg.id);
-            console.log(ids.items.map(track => track.uri));
-            playTrack(headers,ids.items.map(track => track.uri));
-            showCurrentPlayingTrack(headers);
-
-            ids.items.forEach(item =>{
-                createSongBlock(item.track_number,item.uri,item.name,item.artists[0].name,ids.name,`${parseInt(item.duration_ms/1000/60)}:${
-                    parseInt(item.duration_ms/1000 - parseInt(item.duration_ms/1000/60)*60)}`,albumImg.src);
-            })
-            const listBlock = document.querySelector('#showlist');
-            listBlock.style.display = 'flex';
-
-            const listPhoto = document.querySelector('#listPhoto img');
-            listPhoto.src = albumImg.src;
-            listPhoto.id = albumImg.id;
-
-            const listMaker = document.querySelector('.makerAndNumber p');
-            listMaker.innerHTML = `${ids.items[0].artists[0].name}·${ids.total}首歌曲`;
-
-            const listName = document.querySelector('.listName p');
-            listName.innerHTML = album.querySelector('.name').innerHTML;
-        } else {
-            console.log("No image or ID found in album block.");
-        }
+        });
     });
-})
+}
 
-albums.forEach(album => {
-    album.addEventListener('dblclick', async() => {
-        console.log('click');
-        const albumImg = album.querySelector('img');
-        if (albumImg && albumImg.id) {
-            console.log(albumImg.id);
-            const saved = await checkIfAlbumSaved(albumImg.id);
-            console.log(saved);
-            if(saved[0]){
-                const liked = document.querySelector('.like');
-                liked.style.backgroundColor = 'red';
-            }else{
-                const liked = document.querySelector('.like');
-                liked.style.backgroundColor = 'rgb(180,180,180,0.5)';
-            }
-            const ids = await getAlbumTracks(headers, albumImg.id);
-            console.log(ids.items.map(track => track.uri));
-            playTrack(headers,ids.items.map(track => track.uri));
-            showCurrentPlayingTrack(headers);
+// const newalbum = document.querySelectorAll('.album');
 
-            ids.items.forEach(item =>{
-                createSongBlock(item.track_number,item.uri,item.name,item.artists[0].name,ids.name,`${parseInt(item.duration_ms/1000/60)}:${
-                    parseInt(item.duration_ms/1000 - parseInt(item.duration_ms/1000/60)*60)}`,albumImg.src);
-            })
-            const listBlock = document.querySelector('#showlist');
-            listBlock.style.display = 'flex';
-            const mainViewBar = document.querySelector('#mainViewBar');
-            mainViewBar.style.display = 'none';
-            const listPhoto = document.querySelector('#listPhoto img');
-            listPhoto.src = albumImg.src;
-            listPhoto.id = albumImg.id;
+// newalbum.forEach(album => {
+//     album.addEventListener('dblclick', async() => {
+//         console.log('click');
+//         const albumImg = album.querySelector('img'); 
+//         if (albumImg && albumImg.id) {
+//             console.log(albumImg.id);
+//             const saved = await checkIfAlbumSaved(albumImg.id);
+//             console.log(saved);
+//             if(saved[0]){
+//                 const liked = document.querySelector('.like');
+//                 liked.style.backgroundColor = 'red';
+//             }else{
+//                 const liked = document.querySelector('.like');
+//                 liked.style.backgroundColor = 'rgb(180,180,180,0.5)';
+//             }
+//             const ids = await getAlbumTracks(headers, albumImg.id);
+//             console.log(ids.items.map(track => track.uri));
+//             playTrack(headers,ids.items.map(track => track.uri));
+//             showCurrentPlayingTrack(headers);
+//             clearSongs();
+//             ids.items.forEach(item =>{
+//                 createSongBlock(item.track_number,item.uri,item.name,item.artists[0].name,ids.name,`${parseInt(item.duration_ms/1000/60)}:${
+//                     parseInt(item.duration_ms/1000 - parseInt(item.duration_ms/1000/60)*60)}`,albumImg.src);
+//             })
+//             const listBlock = document.querySelector('#showlist');
+//             listBlock.style.display = 'flex';
 
-            const listMaker = document.querySelector('.makerAndNumber p');
-            listMaker.innerHTML = `${ids.items[0].artists[0].name}·${ids.total}首歌曲`;
+//             const listPhoto = document.querySelector('#listPhoto img');
+//             listPhoto.src = albumImg.src;
+//             listPhoto.id = albumImg.id;
 
-            const listName = document.querySelector('.listName p');
-            listName.innerHTML = album.querySelector('.name').innerHTML;
-        } else {
-            console.log("No image or ID found in album block.");
-        }
-    });
-});
+//             const listMaker = document.querySelector('.makerAndNumber p');
+//             listMaker.innerHTML = `${ids.items[0].artists[0].name}·${ids.total}首歌曲`;
+
+//             const listName = document.querySelector('.listName p');
+//             listName.innerHTML = album.querySelector('.name').innerHTML;
+//         } else {
+//             console.log("No image or ID found in album block.");
+//         }
+//     });
+// })
 
 
+
+function clearSongs() {
+    const container = document.getElementById('body');
+    container.innerHTML = ''; 
+}
 
 function createSongBlock(num,songUri, songName, maker, album, time, imageUrl) {
     // 创建一个新的 singleSongBlock 容器
@@ -403,7 +384,7 @@ home.addEventListener('click',()=>{
     mainViewBar.style.display = 'flex';
 })
 
-// 收藏专辑
+// 收藏和移除专辑
 const saveAlbum = document.querySelector("#listPhoto img");
 const saveAlbumId = saveAlbum.id;
 const liked = document.querySelector('.like');
@@ -429,17 +410,124 @@ async function getAlbumSaved(id){
         console.log('Request Failed:',error);
     }
 }
-async function checkAndSave(id){
+
+
+async function checkAndSaveOrDelete(id){
     const status = await checkIfAlbumSaved(id);
     if(status[0]){
+        await getAlbumDelete(id);
         liked.style.backgroundColor = 'rgb(180,180,180,0.5)';
     }else{
         const response = await getAlbumSaved(id);
         liked.style.backgroundColor = 'red';
     }
 }
+
+async function getAlbumDelete(id){
+    const config = {
+        ids:id,
+    }
+    const queryParams = new URLSearchParams(config);
+    try {
+        const response = await fetch(
+            `https://api.spotify.com/v1/me/albums?${queryParams}`,
+            {
+                method:'DELETE',
+                headers: headers,
+                body:{
+                    ids:[id],
+                }
+            }
+        );
+        const ids = await response.json();
+        return ids;
+    }catch(error){
+        console.log('Request Failed:',error);
+    }
+}
+
 liked.addEventListener('click',()=>{
     const saveAlbum = document.querySelector("#listPhoto img");
     const saveAlbumId = saveAlbum.id;
-    checkAndSave(saveAlbumId);
+    checkAndSaveOrDelete(saveAlbumId);
 })
+
+async function fetchPlaylist(id){
+    const config = {
+        playlist_id:id,
+    }
+    const queryParams = new URLSearchParams(config);
+    try {
+        const response = await fetch(
+            `https://api.spotify.com/v1/playlists/${id}`,
+            {
+                method:'GET',
+                headers: headers,
+            }
+        );
+        const ids = await response.json();
+        return ids;
+    }catch(error){
+        console.log('Request Failed:',error);
+    }
+}
+
+export async function addPlaylistClick(){
+    const albums = document.querySelectorAll('#playlist');
+    console.log(albums);
+    albums.forEach(album => {
+        album.addEventListener('dblclick', async() => {
+            console.log('click');
+            const albumImg = album.querySelector('img');
+            if (albumImg && albumImg.id) {
+                console.log(albumImg.id);
+                const saved = await checkIfAlbumSaved(albumImg.id);
+                console.log(saved);
+                if(saved[0]){
+                    const liked = document.querySelector('.like');
+                    liked.style.backgroundColor = 'red';
+                }else{
+                    const liked = document.querySelector('.like');
+                    liked.style.backgroundColor = 'rgb(180,180,180,0.5)';
+                }
+                const ids = await fetchPlaylist(albumImg.id);
+                // console.log(ids.items.map(track => track.uri));
+                playTrack(headers,ids.tracks.items.map(track => track.uri));
+                showCurrentPlayingTrack(headers);
+                clearSongs();
+                let i = 1;
+                ids.tracks.items.forEach(item =>{
+                    createSongBlock(i++,item.track.uri,item.track.name,item.track.artists[0].name,item.track.album.name,`${String(parseInt(item.track.duration_ms/1000/60))}:${
+                        String(parseInt(item.track.duration_ms/1000 - parseInt(item.track.duration_ms/1000/60)*60)).padStart(2,'0')}`,item.track.album.images[0].url);
+                })
+                const listBlock = document.querySelector('#showlist');
+                listBlock.style.display = 'flex';
+                const mainViewBar = document.querySelector('#mainViewBar');
+                mainViewBar.style.display = 'none';
+                const listPhoto = document.querySelector('#listPhoto img');
+                listPhoto.src = albumImg.src;
+                listPhoto.id = albumImg.id;
+    
+                const listMaker = document.querySelector('.makerAndNumber p');
+                listMaker.innerHTML = `${ids.owner.display_name}·${ids.tracks.total}首歌曲`;
+    
+                const listName = document.querySelector('.listName p');
+                listName.innerHTML = ids.name;
+                setTimeout(addSongclick,1000);
+            } else {
+                console.log("No image or ID found in album block.");
+            }
+        });
+    });
+}
+
+function addSongclick(){
+    const songBlocks = document.querySelectorAll('.singleSongBlock');
+    console.log(songBlocks);
+    songBlocks.forEach(songBlock =>{
+        songBlock.addEventListener('dblclick',()=>{
+            const img = songBlock.querySelector('.songPhoto img');
+            playTrack(headers,[img.id]);
+        })
+    })
+}

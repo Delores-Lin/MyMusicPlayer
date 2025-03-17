@@ -5,6 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyMusicPlayer</title>
     <link rel="stylesheet" type="text/css" href="MyMusicPlayerStyle.css">
+    <script>
+        window.onSpotifyWebPlaybackSDKReady = async () => {
+    const token = JSON.parse(sessionStorage.getItem('tokenData')).access_token;
+
+    const player = new Spotify.Player({
+        name: "My Web Player",
+        getOAuthToken: cb => { cb(token);},
+        volume: 0.3
+    });
+
+    player.addListener('ready', ({ device_id }) => {
+        console.log("Spotify Player Ready, Device ID:", device_id);
+        sessionStorage.setItem("spotify_device_id", device_id);
+    });
+
+    player.addListener('not_ready', ({ device_id }) => {
+        console.log("Spotify Player Not Ready, Device ID:", device_id);
+    });
+
+    player.addListener('initialization_error', ({ message }) => {
+        console.error("Initialization Error:", message);
+    });
+
+    player.addListener('authentication_error', ({ message }) => {
+        console.error("Authentication Error:", message);
+    });
+
+    player.addListener('account_error', ({ message }) => {
+        console.error("Account Error:", message);
+    });
+    await player.connect();
+}
+    </script>
 </head>
 <body>
     <div id="main">
@@ -51,7 +84,7 @@
                 <div class="collections" id="0">
                     <img src="https://misc.scdn.co/liked-songs/liked-songs-64.png" id="liked">
                     <div class="collectionInfo">
-                        <p class="collectionName">
+                        <p class="name">
                             123123123111111111111
                         </p>
                         <p class="collectionArtist">
@@ -62,7 +95,7 @@
                 <div class="collections" id="1">
                     <img src="" id="liked">
                     <div class="collectionInfo">
-                        <p class="collectionName">
+                        <p class="name">
                             123123123111111111111
                         </p>
                         <p class="collectionArtist">
@@ -73,7 +106,7 @@
                 <div class="collections" id="2">
                     <img src="" id="liked">
                     <div class="collectionInfo">
-                        <p class="collectionName">
+                        <p class="name">
 
                         </p>
                         <p class="collectionArtist"></p>
@@ -82,7 +115,7 @@
                 <div class="collections" id="3">
                     <img src="" id="liked">
                     <div class="collectionInfo">
-                        <p class="collectionName">
+                        <p class="name">
 
                         </p>
                         <p class="collectionArtist"></p>
@@ -91,7 +124,7 @@
                 <div class="collections" id="4">
                     <img src="" id="liked">
                     <div class="collectionInfo">
-                        <p class="collectionName">
+                        <p class="name">
 
                         </p>
                         <p class="collectionArtist"></p>
@@ -100,7 +133,7 @@
                 <div class="collections" id="5">
                     <img src="" id="liked">
                     <div class="collectionInfo">
-                        <p class="collectionName">
+                        <p class="name">
 
                         </p>
                         <p class="collectionArtist"></p>
@@ -109,7 +142,7 @@
                 <div class="collections" id="6">
                     <img src="" id="liked">
                     <div class="collectionInfo">
-                        <p class="collectionName">
+                        <p class="name">
 
                         </p>
                         <p class="collectionArtist"></p>
@@ -118,7 +151,7 @@
                 <div class="collections" id="7">
                     <img src="" id="liked">
                     <div class="collectionInfo">
-                        <p class="collectionName">
+                        <p class="name">
 
                         </p>
                         <p class="collectionArtist"></p>
@@ -127,7 +160,7 @@
                 <div class="collections" id="8">
                     <img src="" id="liked">
                     <div class="collectionInfo">
-                        <p class="collectionName">
+                        <p class="name">
 
                         </p>
                         <p class="collectionArtist"></p>
@@ -146,37 +179,37 @@
                 </div>
                     <div id="recentPlayBlocks">
                         <div id="blockContainer">
-                            <div id="recentPlayBlock">
+                            <div class="recentPlayBlock">
                                 <img src="" class="recentPlay">
                                 <p class="name">
 
                                 </p>
                             </div>
-                            <div id="recentPlayBlock">
+                            <div class="recentPlayBlock">
                                 <img src="" class="recentPlay">
                                 <p class="name">
                                     
                                 </p>
                             </div>
-                            <div id="recentPlayBlock">
+                            <div class="recentPlayBlock">
                                 <img src="https://misc.scdn.co/liked-songs/liked-songs-64.png" class="recentPlay">
                                 <p class="name">
                                     已点赞的歌曲
                                 </p>
                             </div>
-                            <div id="recentPlayBlock">
+                            <div class="recentPlayBlock">
                                 <img src="" class="recentPlay">
                                 <p class="name">
                                     
                                 </p>
                             </div>
-                            <div id="recentPlayBlock">
+                            <div class="recentPlayBlock">
                                 <img src="" class="recentPlay">
                                 <p class="name">
                                     
                                 </p>
                             </div>
-                            <div id="recentPlayBlock">
+                            <div class="recentPlayBlock">
                                 <img src="" class="recentPlay">
                                 <p class="name">
                                     
