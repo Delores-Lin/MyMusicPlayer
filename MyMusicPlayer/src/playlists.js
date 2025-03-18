@@ -224,3 +224,28 @@ async function removeTrackFromPlaylist(track_uri,playlist_id){
         console.log('Request Failed:',error);
     }
 }
+
+async function createPlaylist(playlistName){
+    const user_id = sessionStorage.getItem('user_id');
+    const config = {
+        playlist_id : playlist_id,
+        fields : 'tracks.items(track.uri)',
+    }
+    const queryParams = new URLSearchParams(config);
+    try {
+        const response = await fetch(
+            `https://api.spotify.com/v1/users/${user_id}/playlists/${playlist_id}?${queryParams}`,
+            {
+                method:'GET',
+                headers: headers,
+                body:JSON.stringify({
+                    name:playlistName,
+                })
+            }
+        );
+        const result = await response.json();
+        return result;
+    }catch(error){
+        console.log('Request Failed:',error);
+    }
+}
