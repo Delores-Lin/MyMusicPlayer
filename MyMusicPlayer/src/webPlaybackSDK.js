@@ -259,6 +259,7 @@ async function showCurrentPlayingTrack(headers){
         console.log(track.item);
         let albumPhoto = document.querySelector('#albumPhoto img');
         albumPhoto.src = track.item.album.images[0].url;
+        albumPhoto.id = track.item.uri;
 
         let trackName = document.querySelector('#songName p');
         trackName.innerHTML = track.item.name;

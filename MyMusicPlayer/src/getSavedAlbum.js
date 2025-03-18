@@ -88,7 +88,7 @@ async function getUserSavedTracks(headers) {
     const queryParams = new URLSearchParams(config);
     try {
         const response = await fetch(
-            `https://api.spotify.com/v1/me/tracks?${queryParams}`,
+            `https://api.spotify.com/v1/me/albums?${queryParams}`,
             {
                 method:'GET',
                 headers: headers,
@@ -123,11 +123,11 @@ async function fetchUserPlaylists(headers,userId){
     const tracksItems = tracks.items;
     for(let j=0 ;i<tracksItems.length && i<9 ;i++){
         collectionBlock[i].id = 'album';
-        collections[i].id = tracksItems[j].track.album.id;
-        collections[i].src = tracksItems[j].track.album.images[0].url;
-        collectionName[i].innerHTML = tracksItems[j].track.album.name;
-        collectionArtist[i].innerHTML = tracksItems[j].track.album.artists[0].name;
-        collectionName[i].id = tracksItems[j].uri;
+        collections[i].id = tracksItems[j].album.id;
+        collections[i].src = tracksItems[j].album.images[0].url;
+        collectionName[i].innerHTML = tracksItems[j].album.name;
+        collectionArtist[i].innerHTML = tracksItems[j].album.artists[0].name;
+        collectionName[i].id = tracksItems[j].album.uri;
         j++;
     }
     const recentPlayBlock = document.querySelectorAll('.recentPlayBlock')
@@ -135,9 +135,9 @@ async function fetchUserPlaylists(headers,userId){
     const recentPlayName = document.querySelectorAll('.recentPlayBlock p');
     for(let i = 0;i<recentPlayImgs.length;i++){
         recentPlayBlock[i].id = 'album';
-        recentPlayImgs[i].src = tracksItems[i].track.album.images[0].url;
-        recentPlayImgs[i].id = tracksItems[i].track.album.id;
-        recentPlayName[i].innerHTML = tracksItems[i].track.album.name;
+        recentPlayImgs[i].src = tracksItems[i].album.images[0].url;
+        recentPlayImgs[i].id = tracksItems[i].album.id;
+        recentPlayName[i].innerHTML = tracksItems[i].album.name;
     }
     addAlbumClick();
     return;

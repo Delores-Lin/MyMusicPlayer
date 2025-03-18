@@ -20,6 +20,7 @@ html,body{
     grid-template-columns:97px 1fr 1fr;
     grid-template-rows: 70px 1fr 80px;
     transition: grid-template-columns 0.5s ease;
+    overflow: hidden;
 }
 #navBar{
     grid-column-start: 1;
@@ -462,7 +463,7 @@ p{
     align-items: center;
     justify-content: center;
     background-color: #121212;
-    z-index: 2;
+    z-index: 10;
 }
 #albumPhoto{
     grid-column-start:1;
@@ -523,7 +524,11 @@ p{
     justify-content: center;
     align-items: center;
 }
-
+#addToList:hover{
+    border-radius: 10px;
+    background-color: rgb(180,180,180,0.5);
+    cursor: pointer;
+}
 p{
     color:white;
 }
@@ -757,7 +762,6 @@ p{
     background: var(--album-background, url("https://misc.scdn.co/liked-songs/liked-songs-64.png")) no-repeat center center;
     background-size:cover;
     
-    /* 视觉效果调整 */
     filter: blur(100px) brightness(1) opacity(1);
     
     z-index: 0; /* 置于图片下方 */
@@ -793,4 +797,130 @@ p{
     color: white !important;
     font-size: 30px !important;
     font-weight: bold;
+}
+
+/* 添加到歌单页面 */
+#addToPlaylist {
+    grid-column-start:1;
+    grid-column-end: 4;
+    grid-row-start: 1;
+    grid-row-end: 4;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    z-index: 500;
+    display:none;
+    position: relative;
+    transition: transform 0.3s ease-in-out;
+}
+#allList {
+    width: 500px;
+    height:600px;
+    border-radius: 15px;
+    box-shadow: #121212b5 0px 0px 20px 2px;
+    background-color: #121212d3;
+    display:flex;
+    flex-direction: column;
+    flex-wrap: rap;
+    justify-content: center;
+    z-index: 2;
+    position: relative;
+}
+#createNewList{
+    width: 50%;
+    height:10%;
+    position:absolute;
+    background-color: #121212;
+    display: flex;
+    justify-content:space-around;
+    align-items: center;
+    border-radius: 5px;
+    z-index: 5;
+    box-shadow: #121212 0 0 5px 1px;
+    display:none;
+}
+#close{
+    position: absolute;
+    top:0;
+    right:0;
+    width:15px;
+    height: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0 5px 0 0;
+}
+#close:hover{
+    cursor: pointer;
+    background-color: rgb(192, 192, 192);
+    color:red;
+}
+#close p{
+    width: 100%;
+    height:100;
+    color: rgb(192, 192, 192);
+}
+#close p:hover{
+    color:rgb(189, 50, 50);
+}
+.listBlock{
+    width:95%;
+    height:20%;
+    display: grid;
+    grid-template-columns:repeat(6,1fr);
+    grid-template-rows: 1fr;
+    place-items: center;
+}
+.listImage{
+    width:60px;
+    height: 60px;
+    grid-column-start:1;
+    grid-column-end: 2;
+    object-fit: contain;
+}
+.listImage img{
+    border-radius: 5px;
+    object-fit: contain;
+}
+.addButton{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-column-start:6;
+    grid-column-end: 7;
+}
+.addButton:hover{
+    cursor:pointer;
+    background-color: rgb(180,180,180,0.5);
+    border-radius: 50%;
+}
+.listBlock p{
+    grid-column-start:2;
+    grid-column-end: 6;
+    width:300px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#toCreateNewList{
+    width:100px;
+    height:30px;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    right:calc(( 100vw - 500px ) / 2 + 10px);
+    bottom : calc((100vh - 600px) / 2 + 10px);
+}
+#toCreateNewList p:hover{
+    color: #1abc54;
+    cursor: pointer;
+}
+#toCreateNewList:hover{
+    cursor: pointer;
+    background-color: rgb(180,180,180,0.5);
+    border-radius: 10px;
 }
