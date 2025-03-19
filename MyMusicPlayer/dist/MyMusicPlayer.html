@@ -311,6 +311,17 @@
                 <img class="iconB" id="pause" src="svg/pause-B.svg">
                 <img class="iconB" id="resume" src="svg/play-B.svg">
             </div>
+            <div id="currentTime">
+                <p>00:00</p>
+            </div>
+            <div id="progressBar">
+                <div id="progress">
+                </div>
+                <div id="progressHandle"></div>
+            </div>
+            <div id="totalTime">
+                <p>00:00</p>
+            </div>
             <div id="next">
                 <img class="icon" src="svg/next.svg">
                 <img class="iconB" src="svg/next-B.svg">
@@ -395,8 +406,8 @@
                     <p>×</p>
                 </div>
                 <p>Name</p>
-                <input id="newListName">
-                <button id="confirm">
+                <input id="newListName" placeholder="请输入新歌单名称">
+                <button id="confirm" disabled>
                     确定
                 </button>
             </div>

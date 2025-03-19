@@ -62,7 +62,7 @@ function addListBlock(imgSrc, listId,listName,checkOrIn) {
     listPhoto.className = 'listPhoto';
     const img = document.createElement('img');
     img.className = 'listImage';
-    img.src = imgSrc;  // 设置传入的图片地址
+    if (imgSrc) img.src = imgSrc;  // 设置传入的图片地址
     listPhoto.appendChild(img);
 
     // 创建 p 元素
@@ -146,9 +146,9 @@ async function buildListBlock(){
     playlists.items.forEach( async (item)=>{
         const status = await checkIfTrackInPlaylist(currentTrack.id,item.id);
         if (status) {
-            await addListBlock(item.images[0].url,item.id,item.name,'svg/ok-circle.svg');
+            await addListBlock(item.images?item.images[0].url:"https://misc.scdn.co/liked-songs/liked-songs-64.png",item.id,item.name,'svg/ok-circle.svg');
         }else{
-            await addListBlock(item.images[0].url,item.id,item.name,'svg/add.svg');
+            await addListBlock(item.images?item.images[0].url:"https://misc.scdn.co/liked-songs/liked-songs-64.png",item.id,item.name,'svg/add.svg');
         }
         const addToListButtons = document.querySelectorAll('.addButton');
         addToListButtons.forEach(addToListButton=>{
@@ -226,17 +226,16 @@ async function removeTrackFromPlaylist(track_uri,playlist_id){
 }
 
 async function createPlaylist(playlistName){
-    const user_id = sessionStorage.getItem('user_id');
+    const user_id = sessionStorage.getItem('userId');
     const config = {
-        playlist_id : playlist_id,
-        fields : 'tracks.items(track.uri)',
+        user_id:user_id,
     }
     const queryParams = new URLSearchParams(config);
     try {
         const response = await fetch(
-            `https://api.spotify.com/v1/users/${user_id}/playlists/${playlist_id}?${queryParams}`,
+            `https://api.spotify.com/v1/users/${user_id}/playlists/?${queryParams}`,
             {
-                method:'GET',
+                method:'POST',
                 headers: headers,
                 body:JSON.stringify({
                     name:playlistName,
@@ -244,8 +243,50 @@ async function createPlaylist(playlistName){
             }
         );
         const result = await response.json();
+        if(result.status === 200 ){
+            addListBlock("https://misc.scdn.co/liked-songs/liked-songs-64.png",result.id,result.name,'svg/add.svg');
+            const add =document.querySelector(`#${result.id}`);
+            const currentTrack = document.querySelector('#albumPhoto img');
+            addButton.addEventListener('click',async()=>{
+                if(add.src === 'svg/add.svg'){
+                    await addToPlaylist([add.id]);
+                    add.src = 'svg/ok-circle.svg';
+                }else{
+                    console.log(currentTrack.id);
+                    await removeTrackFromPlaylist(currentTrack.id,add.id);
+                    add.src = 'svg/add.svg';
+                }
+            });
+        }
         return result;
     }catch(error){
         console.log('Request Failed:',error);
     }
 }
+
+// 检测newListName文本
+const input = document.querySelector('#newListName');
+const confirmButton = document.querySelector('#confirm');
+input.addEventListener('input',()=>{
+    if(input.value.trim()!==''){
+        confirmButton.disabled = false;
+        confirmButton.classList.add('enabled');
+    }else{
+        confirmButton.disabled = true;
+    }
+})
+
+confirmButton.addEventListener('click',async()=>{
+    const result = await createPlaylist(input.value);
+    if (result.status === 200){
+        alert('创建成功！');
+    }
+})
+input.addEventListener('keypress',async(send)=>{
+    if(send.key == 'Enter'){
+        const result = await createPlaylist(input.value);
+        if (result.status === 200){
+            alert('创建成功！');
+        }
+    }
+})

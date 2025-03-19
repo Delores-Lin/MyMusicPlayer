@@ -30,22 +30,12 @@ module.exports = {
         historyApiFallback: {
             index: '/MyMusicPlayer.html' 
         },
-            proxy: [
-                {
-                    context: ["/api/genius"], 
-                    target: "https://api.genius.com",
-                    changeOrigin: true, 
-                    pathRewrite: {
-                    "^/api/genius": "", 
-                    },
-                    secure: false,
-                    proxyTimeout: 60000,
-                    timeout: 60000,
-                    headers: {
-                    Authorization: "Bearer T041Qisugq0wXcbcmxvmanoHeGvrmXYuBcnJyevvawyw10XylmADCAfHQMNEbgn6",
-                    },
-                    logLevel: "debug", 
-                },
-            ],
+        // open: {
+        //     app: {
+        //       // 如果系统中 Chrome 已经添加到 PATH 中，可以直接写 "chrome"
+        //       // 否则请使用完整路径，注意双斜杠或使用反引号包裹
+        //         name: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+        //     }
+        // },
     },
 }

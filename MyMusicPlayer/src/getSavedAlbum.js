@@ -112,7 +112,11 @@ async function fetchUserPlaylists(headers,userId){
     let collectionArtist = document.querySelectorAll('.collectionArtist');
     for(i;i<playlistsItems.length && i<9 ;i++){
         collectionBlock[i].id = 'playlist';
-        collections[i].src = playlistsItems[i].images[0].url;
+        if(playlistsItems[i].images){
+            collections[i].src = playlistsItems[i].images[0].url;
+        }else{
+            collections[i].src ="https://misc.scdn.co/liked-songs/liked-songs-64.png";
+        }
         collections[i].id = playlistsItems[i].id;
         collectionName[i].innerHTML = playlistsItems[i].name;
         collectionArtist[i].innerHTML = playlistsItems[i].owner.display_name;

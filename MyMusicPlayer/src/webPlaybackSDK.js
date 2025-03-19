@@ -253,6 +253,7 @@ async function getCurrentPlayingTrack(headers) {
         console.log('Request Failed:',error.name);
     }
 }
+
 async function showCurrentPlayingTrack(headers){
     const track = await getCurrentPlayingTrack(headers);
     if(track && track.item){
@@ -266,8 +267,7 @@ async function showCurrentPlayingTrack(headers){
 
         let singer = document.querySelector('#singer p');
         singer.innerHTML = track.item.artists[0].name;
-
-
+        initProgress(track.progress_ms,track.item.duration_ms);
         if(track.is_playing === false){
             console.log('isPlaying');
             resumeButton();
@@ -278,7 +278,92 @@ async function showCurrentPlayingTrack(headers){
     }
 }
 
-setInterval(()=>showCurrentPlayingTrack(headers),5*1000);
+let IntervalId = setInterval(()=>showCurrentPlayingTrack(headers),1*1000);
+
+let currentTime = document.querySelector('#currentTime p');
+let totalTime = document.querySelector('#totalTime p');
+
+async function initProgress(progress_ms,duration_ms = timeToMs(totalTime.innerHTML)){
+    console.log(progress_ms,duration_ms);
+    currentTime.innerHTML = msToTime(progress_ms);
+    totalTime.innerHTML = msToTime(duration_ms);
+    const progressPercent = (progress_ms/duration_ms) * 100 ;
+    // console.log('progressPercent',progressPercent);
+    document.querySelector('#progress').style.width = progressPercent + '%';
+    document.querySelector('#progressHandle').style.left = progressPercent + '%';
+}
+
+async function seekToPosition(position_ms){
+    try{
+        const response = await fetch(`https://api.spotify.com/v1/me/player/seek?position_ms=${Number(position_ms - position_ms % 1)}`,{
+            method:'PUT',
+            headers:headers,
+        });
+    }catch(error){
+        console.log(error);
+    }
+}
+
+function msToTime(ms){
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return `${minutes}:${String(seconds).padStart(2, '0')}`;
+}
+
+function timeToMs(timeString) {
+    const [minutes, seconds] = timeString.split(':').map(Number);
+    return (minutes * 60000) + (seconds * 1000);
+}
+
+const progressBar = document.querySelector('#progressBar');
+const progress = document.querySelector('#progress');
+const progressHandle = document.querySelector('#progressHandle');
+
+progressBar.addEventListener('mouseenter',()=>{
+    progressHandle.style.display = 'block';
+})
+progressBar.addEventListener('mouseleave',()=>{
+    progressHandle.style.display = 'none';
+})
+
+let isDragging = false;
+
+progressHandle.addEventListener('mousedown',async(event)=>{
+    isDragging = true;
+    clearInterval(IntervalId);
+    document.addEventListener('mousemove',handleDrag);
+    document.addEventListener('mouseup',async function onMouseUp(){
+        isDragging = false;
+        IntervalId = setInterval(()=>showCurrentPlayingTrack(headers),1*1000);
+        await seekToPosition(timeToMs(currentTime.innerHTML));
+        document.removeEventListener('mousemove',handleDrag);
+        document.removeEventListener('mouseup',onMouseUp);
+    })
+})
+
+function handleDrag(event){
+    if (!isDragging) return;
+    const rect = progressBar.getBoundingClientRect();
+    rect.ondragstart = function(){
+        return false;
+    }
+    let offsetX = event.clientX - rect.left;
+    offsetX = Math.max(0,Math.min(offsetX,rect.width));
+    let time = (offsetX / rect.width ) * timeToMs(totalTime.innerHTML);
+    currentTime.innerHTML = msToTime(time);
+    initProgress(time);
+}
+
+async function handleSeek(event){
+    const rect = progressBar.getBoundingClientRect();
+    const offsetX = event.clientX - rect.left;
+    const time = timeToMs(totalTime.innerHTML);
+    const newProgress = (offsetX / rect.width) * time;
+    initProgress(newProgress);
+    await seekToPosition(newProgress);
+}
+
+progressBar.addEventListener('click',handleSeek);
 
 function pauseButton(){
     const pause = document.querySelectorAll('#pause');
@@ -322,10 +407,10 @@ async function stopOrResumePlaying(status){
         method: "PUT",
         headers: headers,
     });
-    const data = response.json();
-    if(!response.ok){
-        console.log('getdatastatus',data.status);
-    }
+    // const data = response.json();
+    // if(!data.ok){
+    //     console.log('getdatastatus',data.status);
+    // }
     }catch(error){
         console.log('stopPlayingError',error);
     }
