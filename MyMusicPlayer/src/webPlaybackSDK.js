@@ -73,6 +73,8 @@ export async function addAlbumClick(){
     albums.forEach(album => {
         album.addEventListener('dblclick', async() => {
             console.log('click');
+            const searchPage = document.querySelector('#searchPage');
+            searchPage.style.display = 'none';
             const albumImg = album.querySelector('img');
             if (albumImg && albumImg.id) {
                 console.log(albumImg.id);
@@ -607,7 +609,7 @@ export async function addPlaylistClick(){
     });
 }
 
-function addSongclick(){
+export function addSongclick(){
     const songBlocks = document.querySelectorAll('.singleSongBlock');
     console.log(songBlocks);
     songBlocks.forEach(songBlock =>{

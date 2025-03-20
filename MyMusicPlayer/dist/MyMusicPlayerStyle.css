@@ -51,7 +51,8 @@ html,body{
 #navBar{
     display:grid;
     grid-template-columns: repeat(12,1fr);
-    align-content: center;
+    align-items: center;
+    justify-content: center;
 }
 #userImg{
     grid-column-start:1;
@@ -93,18 +94,27 @@ html,body{
 #searchBar{
     display: grid;
     grid-template-columns: repeat(12,1fr);
+    height:50px;
+    width:50px;
     grid-column-start:5;
     grid-column-end: 10;
     justify-content: stretch;
     align-items: center;
-    border-radius: 35px;
+    border-radius: 50px;
     border-color: rgb(0,0,0,0);
     background-color: rgb(67, 67, 67);
+    transition: width 0.5s ease;
+    transform-origin: left;
+    overflow: hidden;
+}
+#searchBar:hover{
+    cursor: pointer;
+    background-color: #ababab73;
 }
 #searchBar img{
     width:auto;
     height:50%;
-    padding-left: 8px;
+    padding-left: 12px;
     grid-column-start:1;
     grid-column-end: 2;
 }
@@ -120,6 +130,7 @@ html,body{
     font-size: 20px;
     caret-color: whitesmoke;
     color:whitesmoke;
+    display: none;
 }
 
 
@@ -268,6 +279,7 @@ html,body{
     height: calc(100% - 5px);
     background-color: rgb(45, 45, 45,0.5);
     border-radius: 10px;
+    /* display:none; */
 }
 
         /* 最近播放样式 */
@@ -1028,4 +1040,25 @@ p{
 #confirm:enabled{
     background-color: #1abc54;
     cursor: pointer;
+}
+
+/* 搜索界面样式 */
+#searchPage{
+    grid-column-start:2;
+    grid-column-end: 4;
+    grid-row-start: 2;
+    grid-row-end: 3;
+    height:calc(100vh - 150px);
+    width:98%;
+    margin-left: 1%;
+    display:flex;
+    border-radius: 10px;
+    z-index: 1;
+    display:none;
+    /* background-color:#ababab; */
+    display:flex;
+    justify-content:center;
+    flex-wrap: wrap;
+    flex-grow: 0; /* 禁止子项增长 */
+    overflow: auto;
 }
